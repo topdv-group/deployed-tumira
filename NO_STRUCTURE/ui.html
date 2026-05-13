@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Referral Gain | Smart Earnings Dashboard</title>
+    <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <div class="glass-panel">
+        <h2>Referral Gain · Nexus</h2>
+
+        <!-- user info card: phone, email + hidden referral ID until paid -->
+        <div class="info-card" id="userInfoCard">
+            <div class="info-row"><strong>Phone:</strong> <span id="displayPhone">—</span></div>
+            <div class="info-row"><strong>Email:</strong> <span id="displayEmail">—</span></div>
+            <div class="info-row" id="referralIdRow">
+                <strong>🔗 Referral ID:</strong>
+                <span id="referralIdValue" class="blurred-id">●●●●●●●●</span>
+                <span class="lock-icon" id="lockIcon">locked</span>
+            </div>
+            <div class="info-row" id="paidStatusInfo" style="margin-top: 8px;">
+                <strong>💎 Status:</strong> 
+                <span id="paymentFlagBadge" class="badge-status badge-unpaid">pending payment</span>
+            </div>
+        </div>
+
+        <!-- referral share section (only fully visible after payment) -->
+        <div class="referral-card" id="referralShareBox">
+            <h3 style="margin-bottom: 6px;">Invite & Earn</h3>
+            <p style="font-size: 0.8rem; color: #4b5563;">Share your unique referral ID → earn <strong>1/2 FRW</strong> per signup</p>
+            <div id="dynamicReferralArea">
+                <div class="hidden-badge" style="margin: 12px auto;">
+                    Activate after startup fee
+                </div>
+            </div>
+            <div id="copyToastArea"></div>
+            <p class="info-text" style="font-size: 11px; margin-top: 8px;">* Referral bonus credited automatically when your referral completes payment</p>
+        </div>
+
+        <!-- payment section -->
+        <div class="payment-section" id="paymentBlock">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>Startup Fee</strong>
+                <span style="font-size: 1.6rem; font-weight: 800; color: #ea580c;">2,000 FRW</span>
+            </div>
+            <div id="paymentStatusRender" style="margin: 12px 0;">
+                <span class="badge-status badge-unpaid">Not activated</span>
+            </div>
+            <button id="payNowActionBtn" class="pay-btn">Pay Now & Unlock Referral ID</button>
+            <p class="payment-note" style="font-size: 10px; margin-top: 8px;">✔️ After payment, your unique referral ID appears instantly.<br>✔️ Share it to start earning commissions.</p>
+        </div>
+
+        <!-- earnings + history -->
+        <div class="earnings-glass">
+            <div>Total Commission Earned</div>
+            <div class="earnings-number" id="totalEarnedDisplay">0</div>
+            <div style="font-size: 0.7rem;">FRW (from referrals)</div>
+        </div>
+
+        <div>
+            <label style="font-weight: 700;">Referral history</label>
+            <div id="historyContainer" class="history-container">
+                <div style="color: #888; text-align: center; padding: 12px;">No referrals yet — pay to unlock sharing</div>
+            </div>
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">Sign out</button>
+    </div>
+</div>
+
+<div id="globalLoader" class="loading-overlay">
+    <div class="spinner-card">
+        <div class="spinner"></div>
+        <p id="loaderMsg">Processing...</p>
+    </div>
+</div>
+
+<!-- FIXED: Correct script tag to load ui.js -->
+<script src="ui.js"></script>
+
+</body>
+</html>

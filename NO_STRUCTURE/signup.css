@@ -1,0 +1,153 @@
+ body {
+      background-color: rgb(134, 105, 212);
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .referal-p{
+      font-size: large;
+      color: #22bbcf;
+    }
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .login-container div {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .login-container input {
+      outline: none;
+      border: 1px solid rgb(134, 105, 212);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 250px;
+      height: 35px;
+      padding: 0 10px;
+      box-sizing: border-box; /* Ensures padding doesn't break the 250px width */
+    }
+    .login-container input:focus {
+      border: 1px solid rgb(134, 105, 212);
+    }
+
+    span {
+      color: rgb(134, 105, 212);
+      cursor: pointer;
+    }
+
+    /* New CSS styling specifically for the static +250 prefix layout */
+    .phone-input-wrapper {
+      position: relative;
+      display: inline-block;
+      width: auto;
+    }
+
+    #Phone {
+      padding-left: 52px; /* Shifts input text right to clear the +250 text */
+      width: 100%;       /* Inherits the full 250px wrapper size */
+    }
+
+    #Phone:active{
+      border: none;
+
+    }
+
+    button{
+      border: none;
+      border: 1px solid #ccc;
+      
+      margin-left: 90px ;
+      margin-top:20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-size: 17px;
+      padding: 8px;
+      color: #555;
+    }
+
+    button:hover{
+      cursor: pointer;
+      border: 1px solid rgb(134, 105, 212);
+    }
+    .static-prefix {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #555;
+      font-weight: bold;
+      font-size: 14px;
+      pointer-events: none; /* Allows user click to pass directly into the input */
+    }
+    
+    .error-msg {
+      color: red;
+      font-size: 12px;
+      margin: 0;
+      display: none; /* Hidden by default */
+    }
+    /* Add these styles to your existing CSS */
+  .loading-spinner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+  }
+
+  .spinner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+  }
+
+  .spinner-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+  }
+
+  .spinner-circle {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid rgb(134, 105, 212);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

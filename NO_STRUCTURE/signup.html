@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+     <meta charset="UTF-8">
+     <title>Referral Gain</title>
+     <link rel="stylesheet" href="signup.css">
+
+     <style>
+  
+</style>
+  </head>
+  <body>
+  <div class="big-container">
+    <div class="login-container">
+
+      
+      <h5 class="referal-p" >Referal gain</h5>
+
+      <div class="options">
+        <p><span>Have Referal code?</span></p>
+      </div>
+
+      <div>
+        
+        <div class="phone-input-wrapper">
+          <span class="static-prefix">+250</span>
+          <!-- Added maxlength to natively stop input past 9 numbers -->
+          <input id="Phone" type="tel" placeholder="788 000 000" maxlength="9">
+        </div>
+        
+        <!-- FIXED: Removed duplicate text and fixed ID syntax -->
+        <input id="Password" type="password" placeholder="Password">
+
+        <input id="email" type="email" placeholder="Email">
+
+        <input id="referal-input" type="text" placeholder="Referal Code(If have one)">
+
+        <!-- Error tag container -->
+        <p id="error" class="error-msg"></p>
+
+        <button id="loginBtn">Submit</button>
+
+        <!-- REPLACED standard span with an anchor tag pointing back to login -->
+        <p>Don't have account <a href="../login/login.html" class="auth-link">Sign In</a></p>
+
+
+
+      </div>
+    </div>
+  </div>
+
+    <script src="signup.js"></script>
+  </body>
+</html>
