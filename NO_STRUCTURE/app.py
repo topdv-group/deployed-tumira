@@ -98,6 +98,16 @@ PAWAPAY_CALLBACK_URL = os.environ.get(
 ACTIVATION_FEE = 2000
 REFERRAL_COMMISSION = 2000
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_files(path):
+    if not path:
+        return open('login.html').read()
+    try:
+        return open(path).read()
+    except:
+        return jsonify({"error": "Not found"}), 404
+        
 # ==================== PASSWORD HELPERS ====================
 def hash_password(password):
     return generate_password_hash(password)
