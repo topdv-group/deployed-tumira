@@ -55,6 +55,11 @@ signupButton.addEventListener('click', async () => {
     return;
   }
 
+  if (passwordValue.length < 6) {
+    showFeedback("Password must be at least 6 characters.", "red");
+    return;
+  }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(emailValue)) {
     showFeedback("Please enter a valid email address.", "red");
@@ -64,8 +69,11 @@ signupButton.addEventListener('click', async () => {
   // Show loading spinner
   showLoading(true, "Creating your account...");
 
+  // FIX: Format phone number to include 250 prefix
+  const formattedPhone = `250${phoneValue}`;
+  
   const payload = {
-    phone: phoneValue,
+    phone: formattedPhone,  // Use formatted phone
     password: passwordValue,
     email: emailValue,
     referralCode: referralValue || "None"
@@ -97,7 +105,7 @@ signupButton.addEventListener('click', async () => {
   } catch (error) {
     console.error("Network Error:", error);
     showLoading(false);
-    showFeedback("server connect failed, is running on http://127.0.0.1:5000", "red");
+    showFeedback("Server connection failed. Please try again.", "red");
   }
 });
 
