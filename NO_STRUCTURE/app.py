@@ -80,7 +80,7 @@ PAWAPAY_API_KEY = os.environ.get('PAWAPAY_API_KEY')
 
 PAWAPAY_BASE_URL = os.environ.get(
     'PAWAPAY_BASE_URL',
-    'https://api.sandbox.pawapay.io/v1'
+    'https://api.pawapay.io/v1'
 )
 
 PAWAPAY_CORRESPONDENT = os.environ.get(
@@ -90,7 +90,7 @@ PAWAPAY_CORRESPONDENT = os.environ.get(
 
 PAWAPAY_CALLBACK_URL = os.environ.get(
     'PAWAPAY_CALLBACK_URL',
-    'https://your-domain.com/api/pawapay-webhook'
+    'https://tumira-production.up.railway.app/api/pawapay-webhook'
 )
 
 # ==================== APP CONSTANTS ====================
@@ -254,19 +254,32 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
                 {'purpose': purpose, 'initiation_response': result}
             )
             
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
+            
             return {
                 "success": True,
                 "depositId": deposit_id,
                 "status": result.get("status"),
                 "message": "Payment initiated successfully"
             }
+
         else:
             error_data = response.json() if response.text else {}
+            
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
+            
             return {
                 "success": False,
                 "message": error_data.get("errorMessage", "Payment initiation failed"),
                 "error_code": response.status_code
             }
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
             
     except Exception as e:
         print(f"Pawapay payment initiation error: {str(e)}")
@@ -324,6 +337,9 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
                 'pending',
                 {'description': description, 'initiation_response': result}
             )
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
             
             return {
                 "success": True,
@@ -331,13 +347,24 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
                 "status": result.get("status"),
                 "message": "Payout initiated successfully"
             }
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
         else:
             error_data = response.json() if response.text else {}
+
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
+            
             return {
                 "success": False,
                 "message": error_data.get("errorMessage", "Payout initiation failed"),
                 "error_code": response.status_code
             }
+            print("REQUEST:", payload)
+            print("STATUS:", response.status_code)
+            print("BODY:", response.text)
             
     except Exception as e:
         print(f"Pawapay payout initiation error: {str(e)}")
@@ -402,11 +429,6 @@ def check_pawapay_transaction_status(transaction_id, transaction_type="deposit")
         return None
 
 # ==================== USER MANAGEMENT ====================
-# Serve HTML pages
-@app.route('/')
-def index():
-    return render_template('login.html')
-
 
 @app.route('/api/register', methods=['POST'])
 @limiter.limit("10 per minute")
