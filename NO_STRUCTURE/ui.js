@@ -1,5 +1,5 @@
 // ---------- CONFIGURATION ----------
-const API_BASE = 'http://127.0.0.1:5000';
+const API_BASE = '';
 const STARTUP_FEE = 2000;
 let currentUser = null;        // { phone, email, paid, referralId, totalEarned, referrals }
 let pollingInterval = null;
@@ -48,9 +48,9 @@ function copyReferralCode(code) {
         return;
     }
     navigator.clipboard.writeText(code).then(() => {
-        showToast(`✅ Referral ID "${code}" copied! Share to earn 5,000 FRW per referral.`);
+        showToast(`Referral ID "${code}" copied! Share to earn 5,000 FRW per referral.`);
     }).catch(() => {
-        showToast("❌ Could not copy. Please select and copy manually.", true);
+        showToast("Could not copy. Please select and copy manually.", true);
     });
 }
 
@@ -71,7 +71,7 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
             referralIdSpan.classList.remove('blurred-id');
             referralIdSpan.classList.add('revealed');
         }
-        if (lockIconSpan) lockIconSpan.innerHTML = '🔓 unlocked';
+        if (lockIconSpan) lockIconSpan.innerHTML = 'unlocked';
         
         // Build shareable referral UI
         if (dynamicArea) {
@@ -79,14 +79,14 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
                 <div class="code-area">
                     <span class="ref-code-text" id="liveReferralCode">${referralIdFromDb}</span>
                     <button class="copy-btn-sm" id="copyRefBtn">
-                        📋 Copy ID
+                        Copy ID
                     </button>
                 </div>
                 <p style="font-size: 12px; color: #059669; margin-top: 12px;">
-                    ✅ Active: Share this code & earn <strong>5,000 FRW</strong> per referral
+                    Active: Share this code & earn <strong> 1/2 FRW</strong> per referral
                 </p>
                 <p style="font-size: 11px; color: #6b7280; margin-top: 8px;">
-                    💡 Each friend who joins using your code and pays activation fee earns you 5,000 FRW
+                    Each friend who joins using your code and pays activation fee earns you 1/2 FRW
                 </p>
             `;
             const copyBtn = document.getElementById('copyRefBtn');
@@ -97,7 +97,7 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
         
         // Update payment section
         if (paymentStatusSpan) {
-            paymentStatusSpan.innerHTML = '<span class="badge-status badge-paid">✅ Activated · Fully Unlocked</span>';
+            paymentStatusSpan.innerHTML = '<span class="badge-status badge-paid">Activated · Fully Unlocked</span>';
         }
         if (payButton) {
             payButton.disabled = true;
@@ -120,7 +120,7 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
             referralIdSpan.classList.add('blurred-id');
             referralIdSpan.classList.remove('revealed');
         }
-        if (lockIconSpan) lockIconSpan.innerHTML = '🔒 locked';
+        if (lockIconSpan) lockIconSpan.innerHTML = 'locked';
         
         // Show paywall message
         if (dynamicArea) {
@@ -132,14 +132,14 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
                     Complete the startup fee payment to unlock your unique referral ID and start earning.
                 </p>
                 <p style="font-size: 11px; color: #f59e0b; margin-top: 8px;">
-                     Pay 2,000 FRW once → Earn 5,000 FRW per referral forever
+                     Pay 2,000 FRW once → Earn 1/2 FRW per referral forever
                 </p>
             `;
         }
         
         // Update payment section
         if (paymentStatusSpan) {
-            paymentStatusSpan.innerHTML = '<span class="badge-status badge-unpaid">⚠️ Not Activated · Pay to Unlock</span>';
+            paymentStatusSpan.innerHTML = '<span class="badge-status badge-unpaid">Not Activated · Pay to Unlock</span>';
         }
         if (payButton) {
             payButton.disabled = false;
@@ -162,22 +162,22 @@ function updateUIForPaidStatus(isPaid, referralIdFromDb = null) {
 // Replace your refreshUserData function with this enhanced version
 async function refreshUserData(phone) {
     try {
-        console.log(`🔄 Fetching user data for: ${phone}`);
+        console.log(`Fetching user data for: ${phone}`);
         showLoader(true, "Loading your dashboard...");
         
         const resp = await fetch(`${API_BASE}/api/user/${phone}`);
         console.log(`📡 API Response status: ${resp.status}`);
         
         const data = await resp.json();
-        console.log("📦 User data received:", data);
+        console.log(" User data received:", data);
         
         if (data.status === 'success' && data.user) {
             const user = data.user;
             const isPaid = user.paid === true || user.paid === 'true';
             
-            console.log(`💰 User paid status: ${isPaid}`);
-            console.log(`🔑 Referral ID: ${user.referralId}`);
-            console.log(`📊 Total earned: ${user.totalEarned}`);
+            console.log(`User paid status: ${isPaid}`);
+            console.log(`Referral ID: ${user.referralId}`);
+            console.log(`Total earned: ${user.totalEarned}`);
             
             // Ensure paid users have a valid random referral ID
             let finalReferralId = user.referralId;
@@ -193,7 +193,7 @@ async function refreshUserData(phone) {
                         body: JSON.stringify({ phone: user.phone, newReferralId: newRefId })
                     });
                     finalReferralId = newRefId;
-                    console.log(`✅ New referral ID generated: ${finalReferralId}`);
+                    console.log(` New referral ID generated: ${finalReferralId}`);
                 } catch (err) {
                     console.warn("Failed to update referral ID:", err);
                 }
@@ -209,7 +209,7 @@ async function refreshUserData(phone) {
                 referrals: user.referrals || []
             };
             
-            console.log("✅ Current user cached:", currentUser);
+            console.log("Current user cached:", currentUser);
             
             // Update user info display
             const displayPhone = document.getElementById('displayPhone');
@@ -220,7 +220,7 @@ async function refreshUserData(phone) {
             if (displayEmail) displayEmail.innerText = user.email || '—';
             if (totalEarnedDisplay) {
                 totalEarnedDisplay.innerText = (currentUser.totalEarned || 0).toLocaleString();
-                console.log(`💰 Displaying total earned: ${currentUser.totalEarned}`);
+                console.log(`Displaying total earned: ${currentUser.totalEarned}`);
             }
             
             // Update referral history
@@ -232,13 +232,13 @@ async function refreshUserData(phone) {
             showLoader(false);
             return { isPaid, refId: finalReferralId };
         } else {
-            console.error("❌ API returned error:", data);
+            console.error("API returned error:", data);
             showLoader(false);
             showToast("Failed to load user data: " + (data.message || "Unknown error"), true);
             return null;
         }
     } catch (err) {
-        console.error('🔥 Refresh user error:', err);
+        console.error('Refresh user error:', err);
         showLoader(false);
         showToast("Network error: Cannot connect to server", true);
         return null;
@@ -252,7 +252,7 @@ function updateReferralHistory(referralsList) {
     if (!referralsList || referralsList.length === 0) {
         historyDiv.innerHTML = `
             <div style="color: #9ca3af; text-align: center; padding: 20px;">
-                📭 No referrals yet<br>
+                 No referrals yet<br>
                 <span style="font-size: 12px;">Share your referral ID after activation to start earning</span>
             </div>
         `;
@@ -300,8 +300,8 @@ async function startPayment() {
         showLoader(false);
         
         if (data.status === 'success') {
-            showToast("✅ Payment prompt sent! Check your mobile money app and complete payment.", false);
-            showToast("⏳ Waiting for payment confirmation...", false);
+            showToast(" Payment prompt sent! Check your mobile money app and complete payment.", false);
+            showToast("Waiting for payment confirmation...", false);
             
             // Start polling for payment confirmation
             startPollingForPayment(currentUser.phone);
@@ -348,7 +348,7 @@ function startPollingForPayment(phone) {
                     clearInterval(paymentCheckInterval);
                     paymentCheckInterval = null;
                     
-                    showToast("🎉 Payment successful! Your referral ID is now active!", false);
+                    showToast("Payment successful! Your referral ID is now active!", false);
                     
                     // Refresh user data
                     await refreshUserData(phone);
@@ -409,7 +409,7 @@ async function manualConfirmPayment(adminKey, phone) {
         
         const data = await response.json();
         if (data.status === 'success') {
-            showToast("✅ Payment manually confirmed!", false);
+            showToast("Payment manually confirmed!", false);
             await refreshUserData(phone);
             return true;
         } else {
@@ -511,12 +511,12 @@ async function initDashboard() {
 }
 
 // Add this right after the configuration
-console.log("🚀 UI.js loaded - Version 2.0");
+console.log("UI.js loaded - Version 2.0");
 
 // Add a manual refresh function for debugging
 async function manualRefresh() {
     if (currentUser && currentUser.phone) {
-        console.log("🔄 Manual refresh triggered");
+        console.log("Manual refresh triggered");
         await refreshUserData(currentUser.phone);
         showToast("Dashboard refreshed!", false);
     } else {
@@ -531,13 +531,13 @@ async function checkBackend() {
         const data = await response.json();
         console.log("📊 Backend status:", data);
         if (data.status === 'success') {
-            showToast(`✅ Connected! ${data.count} users found`, false);
+            showToast(`Connected! ${data.count} users found`, false);
         } else {
-            showToast("⚠️ Backend error", true);
+            showToast(" Backend error", true);
         }
     } catch (err) {
         console.error("Backend connection failed:", err);
-        showToast("❌ Cannot connect to backend", true);
+        showToast(" Cannot connect to backend", true);
     }
 }
 
