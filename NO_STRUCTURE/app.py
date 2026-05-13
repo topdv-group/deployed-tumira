@@ -14,17 +14,27 @@ from functools import wraps
 import requests
 import uuid
 import os
+import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-# Load environment variables
+# ==================== LOAD ENVIRONMENT VARIABLES ====================
+
 load_dotenv()
 
+# ==================== FLASK APP CONFIGURATION ====================
+
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+
+app.secret_key = os.environ.get(
+    'SECRET_KEY',
+    secrets.token_hex(32)
+)
+
 CORS(app, supports_credentials=True)
 
-# Initialize rate limiter
+# ==================== RATE LIMITER ====================
+
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -32,26 +42,48 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
-DATABASE_URL = os.environ.get('databaseURL')
+# ==================== FIREBASE CONFIGURATION ====================
 
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate("serviceAccountKey.json")
+DATABASE_URL = os.environ.get("databaseURL")
+
+cred_json = os.environ.get("FIREBASE_CREDENTIALS")
+
+if not cred_json:
+    raise ValueError("FIREBASE_CREDENTIALS not found")
+
+cred_dict = json.loads(cred_json)
+
+cred = credentials.Certificate(cred_dict)
+
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://tumirarwanda-add46-default-rtdb.europe-west1.firebasedatabase.app'
+    'databaseURL': DATABASE_URL
 })
 
 # ==================== PAWAPAY CONFIGURATION ====================
-# Load from environment variables
+
 PAWAPAY_API_KEY = os.environ.get('PAWAPAY_API_KEY')
-PAWAPAY_BASE_URL = os.environ.get('PAWAPAY_BASE_URL', 'https://api.sandbox.pawapay.io/v1')
-PAWAPAY_CORRESPONDENT = os.environ.get('PAWAPAY_CORRESPONDENT', 'MTN_MOMO_RWA')
-PAWAPAY_CALLBACK_URL = os.environ.get('PAWAPAY_CALLBACK_URL', 'https://your-domain.com/api/pawapay-webhook')
 
-# Configuration constants
-ACTIVATION_FEE = 2000  # RWF
-REFERRAL_COMMISSION = 2000  # RWF (Changed from 5000 to match activation fee)
+PAWAPAY_BASE_URL = os.environ.get(
+    'PAWAPAY_BASE_URL',
+    'https://api.sandbox.pawapay.io/v1'
+)
 
-# Helper function to hash passwords using Werkzeug
+PAWAPAY_CORRESPONDENT = os.environ.get(
+    'PAWAPAY_CORRESPONDENT',
+    'MTN_MOMO_RWA'
+)
+
+PAWAPAY_CALLBACK_URL = os.environ.get(
+    'PAWAPAY_CALLBACK_URL',
+    'https://your-domain.com/api/pawapay-webhook'
+)
+
+# ==================== APP CONSTANTS ====================
+
+ACTIVATION_FEE = 2000
+REFERRAL_COMMISSION = 2000
+
+# ==================== PASSWORD HELPERS ====================
 def hash_password(password):
     return generate_password_hash(password)
 
