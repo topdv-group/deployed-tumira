@@ -72,7 +72,7 @@ signupButton.addEventListener('click', async () => {
   };
 
   try {
-    const response = await fetch('api/register', {
+    const response = await fetch('/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -84,7 +84,7 @@ signupButton.addEventListener('click', async () => {
 
     if (data.status === "success") {
       showLoading(false);
-      showFeedback("✅ Registration successful! Redirecting to login...", "green");
+      showFeedback("Registration successful! Redirecting to login...", "green");
       
       setTimeout(() => {
         clearFormFields();
