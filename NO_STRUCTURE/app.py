@@ -17,6 +17,7 @@ import os
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+from flask import render_template, send_from_directory
 
 # ==================== LOAD ENVIRONMENT VARIABLES ====================
 
@@ -379,6 +380,11 @@ def check_pawapay_transaction_status(transaction_id, transaction_type="deposit")
         return None
 
 # ==================== USER MANAGEMENT ====================
+# Serve HTML pages
+@app.route('/')
+def index():
+    return render_template('login.html')
+
 
 @app.route('/api/register', methods=['POST'])
 @limiter.limit("10 per minute")
