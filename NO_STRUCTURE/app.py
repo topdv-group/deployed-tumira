@@ -100,13 +100,25 @@ REFERRAL_COMMISSION = 2000
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def serve_files(path):
+def serve_all_files(path):
+    # Serve login.html for root path
     if not path:
-        return open('login.html').read()
+        with open('login.html', 'r') as f:
+            return f.read()
+    
+    # Serve any other file (login.js, login.css, etc.)
     try:
-        return open(path).read()
-    except:
-        return jsonify({"error": "Not found"}), 404
+        with open(path, 'r') as f:
+            content = f.read()
+            # Set correct content type
+            if path.endswith('.css'):
+                return content, 200, {'Content-Type': 'text/css'}
+            elif path.endswith('.js'):
+                return content, 200, {'Content-Type': 'application/javascript'}
+            else:
+                return content
+    except FileNotFoundError:
+        return "File not found", 404
         
 # ==================== PASSWORD HELPERS ====================
 def hash_password(password):
