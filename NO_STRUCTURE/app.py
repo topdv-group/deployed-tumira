@@ -44,7 +44,7 @@ limiter = Limiter(
 
 # ==================== FIREBASE CONFIGURATION ====================
 
-DATABASE_URL = os.environ.get("databaseURL")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 cred_json = os.environ.get("FIREBASE_CREDENTIALS")
 
