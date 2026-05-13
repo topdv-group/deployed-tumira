@@ -72,7 +72,7 @@ signupButton.addEventListener('click', async () => {
   };
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/api/register', {
+    const response = await fetch('api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ signupButton.addEventListener('click', async () => {
   } catch (error) {
     console.error("Network Error:", error);
     showLoading(false);
-    showFeedback("Failed to connect to the server. Make sure Flask is running on http://127.0.0.1:5000", "red");
+    showFeedback("server connect failed, is running on http://127.0.0.1:5000", "red");
   }
 });
 
