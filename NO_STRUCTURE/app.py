@@ -46,19 +46,33 @@ limiter = Limiter(
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set")
+
+# Initialize Firebase - Railway compatible
 cred_json = os.environ.get("FIREBASE_CREDENTIALS")
 
 if not cred_json:
-    raise ValueError("FIREBASE_CREDENTIALS not found")
+    raise ValueError("FIREBASE_CREDENTIALS environment variable not set on Railway")
 
-cred_dict = json.loads(cred_json)
+# Parse the JSON credentials
+try:
+    cred_dict = json.loads(cred_json)
+    cred = credentials.Certificate(cred_dict)
+    print("✅ Firebase credentials loaded successfully")
+except json.JSONDecodeError as e:
+    print(f"❌ Failed to parse FIREBASE_CREDENTIALS: {e}")
+    raise
 
-cred = credentials.Certificate(cred_dict)
-
-firebase_admin.initialize_app(cred, {
-    'databaseURL': DATABASE_URL
-})
-
+# Initialize Firebase app
+try:
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': DATABASE_URL
+    })
+    print("✅ Firebase initialized successfully")
+except Exception as e:
+    print(f"❌ Firebase initialization failed: {e}")
+    raise
 # ==================== PAWAPAY CONFIGURATION ====================
 
 PAWAPAY_API_KEY = os.environ.get('PAWAPAY_API_KEY')
