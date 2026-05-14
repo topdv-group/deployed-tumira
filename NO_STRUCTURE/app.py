@@ -80,7 +80,7 @@ PAWAPAY_API_KEY = os.environ.get('PAWAPAY_API_KEY')
 
 PAWAPAY_BASE_URL = os.environ.get(
     'PAWAPAY_BASE_URL',
-    'https://api.pawapay.io/v1'
+    'https://api.pawapay.io/v2'
 )
 
 PAWAPAY_CORRESPONDENT = os.environ.get(
@@ -209,7 +209,7 @@ def update_transaction_status(transaction_id, new_status, additional_details=Non
 
 def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activation"):
     """
-    Initiate a payment collection via Pawapay (deposit)
+    Initiate a payment collection via Pawapay v2 API (deposit)
     Returns: deposit_id and status
     """
     try:
@@ -219,21 +219,22 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
         # Generate unique deposit ID
         deposit_id = str(uuid.uuid4())
         
+        # CORRECT v2 API payload format for deposits
         payload = {
             "depositId": deposit_id,
             "amount": str(amount),
             "currency": "RWF",
-            "correspondent": PAWAPAY_CORRESPONDENT,
             "payer": {
-                "type": "MSISDN",
-                "address": {
-                    "value": formatted_phone
+                "type": "MMO",  # Changed from MSISDN to MMO for mobile money
+                "accountDetails": {
+                    "phoneNumber": formatted_phone,  # Direct phone number field
+                    "provider": "MTN_MOMO_RWA"  # Provider inside accountDetails
                 }
             },
             "customerTimestamp": datetime.now().isoformat(),
             "clientReferenceId": f"{purpose}_{user_id}_{int(datetime.now().timestamp())}",
-            "customerMessage": f"Payment TUMIRA",
-            "statementDescription": f"TUMIRA Payment",
+            "customerMessage": "TUMIRA PAYMENT",
+            "statementDescription": "TUMIRA DEPOSIT",  # Max 22 characters
             "callbackUrl": PAWAPAY_CALLBACK_URL
         }
         
@@ -242,12 +243,18 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
             "Content-Type": "application/json"
         }
         
+        print("📤 Sending Pawapay v2 deposit request...")
+        print("REQUEST:", json.dumps(payload, indent=2))
+        
         response = requests.post(
             f"{PAWAPAY_BASE_URL}/deposits",
             json=payload,
             headers=headers,
             timeout=30
         )
+        
+        print("STATUS:", response.status_code)
+        print("BODY:", response.text)
         
         if response.status_code in [200, 201, 202]:
             result = response.json()
@@ -259,12 +266,8 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
                 amount,
                 deposit_id,
                 'pending',
-                {'purpose': purpose, 'initiation_response': result}
+                {'purpose': purpose, 'initiation_response': result, 'api_version': 'v2'}
             )
-            
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
             
             return {
                 "success": True,
@@ -276,26 +279,30 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
         else:
             error_data = response.json() if response.text else {}
             
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
+            # Log the failure
+            log_transaction(
+                'deposit',
+                phone_number,
+                amount,
+                deposit_id,
+                'failed',
+                {'error': error_data, 'api_version': 'v2'}
+            )
             
             return {
                 "success": False,
-                "message": error_data.get("errorMessage", "Payment initiation failed"),
+                "message": error_data.get("message", error_data.get("errorMessage", "Payment initiation failed")),
                 "error_code": response.status_code
             }
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
             
     except Exception as e:
         print(f"Pawapay payment initiation error: {str(e)}")
         return {"success": False, "message": str(e)}
 
+
 def init_pawapay_payout(phone_number, amount, user_id, description="Referral commission"):
     """
-    Send payout to user via Pawapay
+    Send payout to user via Pawapay v2 API
     Returns: payout_id and status
     """
     try:
@@ -305,19 +312,20 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
         # Generate unique payout ID
         payout_id = str(uuid.uuid4())
         
+        # CORRECT v2 API payload format for payouts
         payload = {
             "payoutId": payout_id,
             "amount": str(amount),
             "currency": "RWF",
-            "correspondent": PAWAPAY_CORRESPONDENT,
             "recipient": {
-                "type": "MMO",
-                "address": {
-                    "value": formatted_phone
+                "type": "MMO",  # Use MMO for mobile money payouts
+                "accountDetails": {
+                    "phoneNumber": formatted_phone,  # Direct phone number field
+                    "provider": "MTN_MOMO_RWA"  # Provider inside accountDetails
                 }
             },
             "customerTimestamp": datetime.now().isoformat(),
-            "statementDescription": description,
+            "statementDescription": "TUMIRA CASHOUT",  # Max 22 characters, short and clear
             "callbackUrl": PAWAPAY_CALLBACK_URL
         }
         
@@ -326,12 +334,18 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
             "Content-Type": "application/json"
         }
         
+        print("📤 Sending Pawapay v2 payout request...")
+        print("REQUEST:", json.dumps(payload, indent=2))
+        
         response = requests.post(
             f"{PAWAPAY_BASE_URL}/payouts",
             json=payload,
             headers=headers,
             timeout=30
         )
+        
+        print("STATUS:", response.status_code)
+        print("BODY:", response.text)
         
         if response.status_code in [200, 201, 202]:
             result = response.json()
@@ -343,11 +357,8 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
                 amount,
                 payout_id,
                 'pending',
-                {'description': description, 'initiation_response': result}
+                {'description': description, 'initiation_response': result, 'api_version': 'v2'}
             )
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
             
             return {
                 "success": True,
@@ -355,28 +366,29 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
                 "status": result.get("status"),
                 "message": "Payout initiated successfully"
             }
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
         else:
             error_data = response.json() if response.text else {}
-
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
+            
+            # Log the failure
+            log_transaction(
+                'payout',
+                phone_number,
+                amount,
+                payout_id,
+                'failed',
+                {'error': error_data, 'api_version': 'v2'}
+            )
             
             return {
                 "success": False,
-                "message": error_data.get("errorMessage", "Payout initiation failed"),
+                "message": error_data.get("message", error_data.get("errorMessage", "Payout initiation failed")),
                 "error_code": response.status_code
             }
-            print("REQUEST:", payload)
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
             
     except Exception as e:
         print(f"Pawapay payout initiation error: {str(e)}")
         return {"success": False, "message": str(e)}
+
 
 def format_phone_number(phone):
     """
@@ -390,24 +402,40 @@ def format_phone_number(phone):
     if cleaned.startswith('0'):
         cleaned = cleaned[1:]
     
-    # If starts with 250, ensure it's exactly 12 digits
-    if cleaned.startswith('250'):
-        if len(cleaned) == 12:
-            return cleaned
-        elif len(cleaned) > 12:
-            return cleaned[:12]
+    # If already starts with 250 and is exactly 12 digits, return as is
+    if cleaned.startswith('250') and len(cleaned) == 12:
+        return cleaned
     
-    # If starts with 250 but has more digits, truncate
-    if cleaned.startswith('250'):
+    # If starts with 250 but longer than 12 digits, truncate
+    if cleaned.startswith('250') and len(cleaned) > 12:
         return cleaned[:12]
     
-    # Add 250 prefix if not present
+    # If starts with 250 but shorter than 12 digits, log warning but proceed
+    if cleaned.startswith('250') and len(cleaned) < 12:
+        print(f"Warning: Phone number {cleaned} is shorter than expected 12 digits")
+        return cleaned
+    
+    # Add 250 prefix for 9-digit numbers (e.g., 794399063)
     if len(cleaned) == 9:
         return f"250{cleaned}"
-    elif len(cleaned) == 10:
+    
+    # Handle 10-digit numbers that might have leading 0 (e.g., 0794399063)
+    if len(cleaned) == 10 and cleaned.startswith('0'):
         return f"250{cleaned[1:]}"
     
-    return f"250{cleaned}"[:12]
+    # Handle 10-digit numbers without leading 0
+    if len(cleaned) == 10:
+        return f"250{cleaned}"
+    
+    # For any other length, try to add 250 prefix and truncate to 12 digits
+    if not cleaned.startswith('250'):
+        cleaned = f"250{cleaned}"
+    
+    # Ensure we return exactly 12 digits if possible
+    if len(cleaned) > 12:
+        cleaned = cleaned[:12]
+    
+    return cleaned
 
 def check_pawapay_transaction_status(transaction_id, transaction_type="deposit"):
     """
