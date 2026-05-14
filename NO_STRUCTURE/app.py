@@ -90,7 +90,7 @@ PAWAPAY_CORRESPONDENT = os.environ.get(
 
 PAWAPAY_CALLBACK_URL = os.environ.get(
     'PAWAPAY_CALLBACK_URL',
-    'https://tumira-production.up.railway.app/api/pawapay-webhook'
+    'https://tumira-rwanda.up.railway.app/api/pawapay-webhook'
 )
 
 # ==================== APP CONSTANTS ====================
@@ -224,8 +224,8 @@ def init_pawapay_payment(phone_number, amount, email, user_id, purpose="activati
             },
             "customerTimestamp": datetime.now().isoformat(),
             "clientReferenceId": f"{purpose}_{user_id}_{int(datetime.now().timestamp())}",
-            "customerMessage": f"Payment for TUMIRA {purpose.upper()}",
-            "statementDescription": f"TUMIRA {purpose.capitalize()} Payment",
+            "customerMessage": f"Payment TUMIRA",
+            "statementDescription": f"TUMIRA Payment",
             "callbackUrl": PAWAPAY_CALLBACK_URL
         }
         
