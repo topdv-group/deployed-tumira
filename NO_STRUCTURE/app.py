@@ -98,6 +98,14 @@ PAWAPAY_CALLBACK_URL = os.environ.get(
 ACTIVATION_FEE = 2000
 REFERRAL_COMMISSION = 2000
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Railway"""
+    return jsonify({
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat()
+    }), 200
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_all_files(path):
@@ -186,7 +194,7 @@ def update_transaction_status(transaction_id, new_status, additional_details=Non
             
             global_ref.update(updates)
             
-            # Also update user-specific transaction
+            # Also update user-specific transaction 
             phone = transaction.get('phone')
             if phone:
                 user_txn_ref = db.reference(f'transactions/{phone}/{transaction_id}')
@@ -303,7 +311,7 @@ def init_pawapay_payout(phone_number, amount, user_id, description="Referral com
             "currency": "RWF",
             "correspondent": PAWAPAY_CORRESPONDENT,
             "recipient": {
-                "type": "MSISDN",
+                "type": "MMO",
                 "address": {
                     "value": formatted_phone
                 }
@@ -1229,15 +1237,46 @@ def debug_pending_payouts():
             return jsonify({"status": "success", "pending": [], "count": 0}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
+@app.route('/api/manual-activate/<phone>', methods=['POST'])
+def manual_activate(phone):
+    """Emergency endpoint to manually activate a user"""
+    try:
+        # Admin key protection (add a secret key)
+        admin_key = request.headers.get('X-Admin-Key')
+        if admin_key != os.environ.get('ADMIN_KEY', 'your-secret-key'):
+            return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        
+        user_ref = db.reference(f'users/{phone}')
+        user_data = user_ref.get()
+        
+        if not user_data:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+        
+        if user_data.get('paid'):
+            return jsonify({"status": "success", "message": "User already activated"}), 200
+        
+        # Activate user
+        user_ref.update({
+            'paid': True,
+            'paidAt': datetime.now().isoformat(),
+            'paidAmount': 2000,
+            'transactionId': f"MANUAL_{datetime.now().timestamp()}"
+        })
+        
+        return jsonify({
+            "status": "success",
+            "message": "User activated manually"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    # Get debug setting from environment variable (default to False for production)
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))  # Railway default is 8080
     
     app.run(
         debug=debug_mode,
-        host='0.0.0.0' if not debug_mode else '127.0.0.1',
+        host='0.0.0.0',  # ALWAYS use 0.0.0.0 on Railway
         port=port
     )
